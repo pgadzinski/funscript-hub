@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "FunScript Hub"
+version = "1.0.0"
+id = "artifacts/funscript-hub"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 24334
+
+[services.development]
+run = "pnpm --filter @workspace/funscript-hub run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/funscript-hub", "run", "build" ]
+publicDir = "artifacts/funscript-hub/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24334"
+BASE_PATH = "/"
