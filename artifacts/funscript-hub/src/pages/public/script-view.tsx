@@ -1,21 +1,47 @@
-import { useParams, Link } from "wouter";
-import { 
-  useAccessScript, 
-  getAccessScriptQueryKey 
-} from "@workspace/api-client-react";
+import { useEffect, useState } from "react";
+import { useParams } from "wouter";
+import type { FunScript } from "@workspace/api-client-react";
 import { Activity } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function PublicScriptView() {
   const { token } = useParams();
 
-  const { data: script, isLoading, error } = useAccessScript(token || "", {
-    query: { 
-      enabled: !!token, 
-      queryKey: getAccessScriptQueryKey(token || ""),
-      retry: false
-    }
-  });
+  const [script, setScript] = useState<FunScript | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  // Direct fetch on every mount — bypasses React Query cache so every page
+  // load triggers a real API call and gets tracked as a unique visit.
+  useEffect(() => {
+    if (!token) return;
+    let cancelled = false;
+
+    setIsLoading(true);
+    setNotFound(false);
+
+    fetch(`/api/s/${token}`)
+      .then((res) => {
+        if (res.status === 404) {
+          if (!cancelled) setNotFound(true);
+          return null;
+        }
+        return res.json();
+      })
+      .then((data) => {
+        if (!cancelled && data) setScript(data as FunScript);
+      })
+      .catch(() => {
+        if (!cancelled) setNotFound(true);
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
 
   if (isLoading) {
     return (
@@ -27,7 +53,7 @@ export default function PublicScriptView() {
     );
   }
 
-  if (error || !script) {
+  if (notFound || !script) {
     return (
       <div className="min-h-screen w-full flex flex-col items-center justify-center bg-zinc-950 text-zinc-50 p-6 text-center">
         <div className="max-w-md w-full p-8 border border-zinc-800 rounded-xl bg-zinc-900/50 backdrop-blur-sm">
@@ -46,7 +72,7 @@ export default function PublicScriptView() {
       <header className="flex items-center justify-between p-4 border-b border-zinc-800/50 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-10">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold border border-primary/30">
-            {script.creatorName ? script.creatorName.slice(0, 1).toUpperCase() : 'C'}
+            {script.creatorName ? script.creatorName.slice(0, 1).toUpperCase() : "C"}
           </div>
           <div>
             <h1 className="font-semibold leading-tight text-zinc-100">{script.title}</h1>
@@ -54,8 +80,16 @@ export default function PublicScriptView() {
           </div>
         </div>
         <div className="hidden sm:flex">
-          <Button variant="outline" className="border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100" asChild>
-            <a href={`https://twitter.com/${script.creatorHandle}`} target="_blank" rel="noreferrer">
+          <Button
+            variant="outline"
+            className="border-zinc-700 hover:bg-zinc-800 hover:text-zinc-100"
+            asChild
+          >
+            <a
+              href={`https://twitter.com/${script.creatorHandle}`}
+              target="_blank"
+              rel="noreferrer"
+            >
               Follow @{script.creatorHandle}
             </a>
           </Button>
@@ -74,21 +108,26 @@ export default function PublicScriptView() {
 
         {script.contentUrl ? (
           <div className="flex-1 w-full flex flex-col rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900/30 shadow-2xl relative group min-h-[400px]">
-            {/* If it's a known embed type we could parse it, but for safety we use an iframe or link */}
             <div className="absolute inset-0 flex items-center justify-center bg-zinc-900 z-0">
               <Activity className="h-8 w-8 text-zinc-800 animate-pulse" />
             </div>
-            <iframe 
-              src={script.contentUrl} 
+            <iframe
+              src={script.contentUrl}
               className="w-full h-full min-h-[500px] border-0 z-10 relative bg-transparent"
               title={script.title}
               allowFullScreen
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             />
-            
             <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button size="sm" variant="secondary" asChild className="shadow-lg backdrop-blur-md bg-zinc-800/80 hover:bg-zinc-700 text-zinc-100">
-                <a href={script.contentUrl} target="_blank" rel="noreferrer">Open in new tab</a>
+              <Button
+                size="sm"
+                variant="secondary"
+                asChild
+                className="shadow-lg backdrop-blur-md bg-zinc-800/80 hover:bg-zinc-700 text-zinc-100"
+              >
+                <a href={script.contentUrl} target="_blank" rel="noreferrer">
+                  Open in new tab
+                </a>
               </Button>
             </div>
           </div>
@@ -97,12 +136,13 @@ export default function PublicScriptView() {
             <Activity className="h-16 w-16 text-primary/40 mb-6" />
             <h3 className="text-xl font-semibold text-zinc-200 mb-2">Content Ready</h3>
             <p className="text-zinc-500 max-w-md">
-              This script has been accessed successfully, but no embedded visual content was provided by the creator.
+              This script has been accessed successfully, but no embedded visual content was
+              provided by the creator.
             </p>
           </div>
         )}
       </main>
-      
+
       <footer className="py-6 text-center text-zinc-600 text-sm border-t border-zinc-800/50 mt-auto">
         Powered by FunScript Hub
       </footer>
