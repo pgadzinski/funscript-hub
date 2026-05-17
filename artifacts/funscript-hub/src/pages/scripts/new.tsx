@@ -2,12 +2,11 @@ import { useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { 
-  useCreateScript, 
+import {
+  useCreateScript,
   getListScriptsQueryKey,
   useListCreators,
   getListCreatorsQueryKey,
-  getListOverviewStatsQueryKey
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -22,11 +21,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useEffect, useState } from "react";
+import { HandyRecorder, type FunscriptData } from "@/components/handy-recorder";
 
 const formSchema = z.object({
   creatorId: z.coerce.number().min(1, "Creator is required"),
@@ -38,14 +39,16 @@ const formSchema = z.object({
 type FormValues = z.infer<typeof formSchema>;
 
 export default function NewScript() {
-  const [location, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const searchParams = new URLSearchParams(window.location.search);
   const initialCreatorId = searchParams.get("creatorId");
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const createScript = useCreateScript();
-  
+
+  const [funscriptData, setFunscriptData] = useState<FunscriptData | null>(null);
+
   const { data: creators, isLoading: creatorsLoading } = useListCreators({
     query: { queryKey: getListCreatorsQueryKey() }
   });
@@ -70,9 +73,10 @@ export default function NewScript() {
     const submitData = {
       ...data,
       contentUrl: data.contentUrl || undefined,
-      description: data.description || undefined
+      description: data.description || undefined,
+      funscriptData: funscriptData ?? undefined,
     };
-    
+
     createScript.mutate({ data: submitData }, {
       onSuccess: (script) => {
         toast({
@@ -80,7 +84,6 @@ export default function NewScript() {
           description: "The FunScript has been created and is ready to share.",
         });
         queryClient.invalidateQueries({ queryKey: getListScriptsQueryKey() });
-        queryClient.invalidateQueries({ queryKey: ["/api/overview-stats"] }); // invalidate overview stats
         setLocation(`/scripts/${script.id}`);
       },
       onError: (error) => {
@@ -122,8 +125,8 @@ export default function NewScript() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Creator</FormLabel>
-                    <Select 
-                      onValueChange={(val) => field.onChange(parseInt(val, 10))} 
+                    <Select
+                      onValueChange={(val) => field.onChange(parseInt(val, 10))}
                       defaultValue={field.value ? field.value.toString() : ""}
                       disabled={creatorsLoading || !!initialCreatorId}
                     >
@@ -144,7 +147,7 @@ export default function NewScript() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="title"
@@ -158,7 +161,7 @@ export default function NewScript() {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="description"
@@ -166,17 +169,17 @@ export default function NewScript() {
                   <FormItem>
                     <FormLabel>Description (Optional)</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        placeholder="What is this script about?" 
-                        className="resize-none h-24" 
-                        {...field} 
+                      <Textarea
+                        placeholder="What is this script about?"
+                        className="resize-none h-24"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="contentUrl"
@@ -193,7 +196,21 @@ export default function NewScript() {
                   </FormItem>
                 )}
               />
-              
+
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">Handy Recording (Optional)</Label>
+                <HandyRecorder
+                  onScriptReady={setFunscriptData}
+                  initialData={null}
+                />
+                {funscriptData && (
+                  <p className="text-xs text-green-600 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    {funscriptData.actions.length} movement points recorded — will be saved with this script
+                  </p>
+                )}
+              </div>
+
               <div className="flex justify-end gap-4 pt-4">
                 <Button type="button" variant="outline" onClick={() => setLocation(initialCreatorId ? `/creators/${initialCreatorId}` : "/scripts")}>
                   Cancel

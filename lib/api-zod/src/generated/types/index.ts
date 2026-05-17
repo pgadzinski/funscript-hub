@@ -13,6 +13,8 @@ export * from './creatorInput';
 export * from './creatorUpdate';
 export * from './dailyCount';
 export * from './funScript';
+export * from './funscriptAction';
+export * from './funscriptFileData';
 export * from './funScriptInput';
 export * from './funScriptUpdate';
 export * from './healthStatus';

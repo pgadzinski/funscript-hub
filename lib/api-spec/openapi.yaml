@@ -404,6 +404,32 @@ components:
         bio:
           type: ["string", "null"]
 
+    FunscriptAction:
+      type: object
+      required: [at, pos]
+      properties:
+        at:
+          type: integer
+          description: Milliseconds from start
+        pos:
+          type: integer
+          description: Position 0-100
+
+    FunscriptFileData:
+      type: object
+      required: [version, actions]
+      properties:
+        version:
+          type: string
+        inverted:
+          type: boolean
+        range:
+          type: integer
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/FunscriptAction"
+
     FunScript:
       type: object
       required: [id, creatorId, title, shareToken, viewCount, createdAt]
@@ -422,6 +448,9 @@ components:
           type: ["string", "null"]
         contentUrl:
           type: ["string", "null"]
+        funscriptData:
+          $ref: "#/components/schemas/FunscriptFileData"
+          nullable: true
         shareToken:
           type: string
         viewCount:
@@ -446,6 +475,8 @@ components:
           type: string
         contentUrl:
           type: string
+        funscriptData:
+          $ref: "#/components/schemas/FunscriptFileData"
         expiresAt:
           type: string
 
@@ -459,6 +490,9 @@ components:
           type: ["string", "null"]
         contentUrl:
           type: ["string", "null"]
+        funscriptData:
+          $ref: "#/components/schemas/FunscriptFileData"
+          nullable: true
         expiresAt:
           type: ["string", "null"]
 

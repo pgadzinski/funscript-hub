@@ -5,6 +5,7 @@
  * FunScript Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { FunscriptFileData } from './funscriptFileData';
 
 export interface FunScriptInput {
   creatorId: number;
@@ -12,5 +13,6 @@ export interface FunScriptInput {
   title: string;
   description?: string;
   contentUrl?: string;
+  funscriptData?: FunscriptFileData;
   expiresAt?: string;
 }

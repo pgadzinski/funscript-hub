@@ -118,6 +118,15 @@ export const ListScriptsByCreatorResponseItem = zod.object({
   "title": zod.string(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "shareToken": zod.string(),
   "viewCount": zod.number(),
   "expiresAt": zod.string().nullish(),
@@ -138,6 +147,15 @@ export const ListScriptsResponseItem = zod.object({
   "title": zod.string(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "shareToken": zod.string(),
   "viewCount": zod.number(),
   "expiresAt": zod.string().nullish(),
@@ -158,6 +176,15 @@ export const CreateScriptBody = zod.object({
   "title": zod.string().min(1),
   "description": zod.string().optional(),
   "contentUrl": zod.string().optional(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).optional(),
   "expiresAt": zod.string().optional()
 })
 
@@ -177,6 +204,15 @@ export const GetScriptResponse = zod.object({
   "title": zod.string(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "shareToken": zod.string(),
   "viewCount": zod.number(),
   "expiresAt": zod.string().nullish(),
@@ -199,6 +235,15 @@ export const UpdateScriptBody = zod.object({
   "title": zod.string().min(1).optional(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "expiresAt": zod.string().nullish()
 })
 
@@ -210,6 +255,15 @@ export const UpdateScriptResponse = zod.object({
   "title": zod.string(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "shareToken": zod.string(),
   "viewCount": zod.number(),
   "expiresAt": zod.string().nullish(),
@@ -276,6 +330,15 @@ export const AccessScriptResponse = zod.object({
   "title": zod.string(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "shareToken": zod.string(),
   "viewCount": zod.number(),
   "expiresAt": zod.string().nullish(),
@@ -306,6 +369,15 @@ export const GetTopScriptsResponseItem = zod.object({
   "title": zod.string(),
   "description": zod.string().nullish(),
   "contentUrl": zod.string().nullish(),
+  "funscriptData": zod.object({
+  "version": zod.string(),
+  "inverted": zod.boolean().optional(),
+  "range": zod.number().optional(),
+  "actions": zod.array(zod.object({
+  "at": zod.number().describe('Milliseconds from start'),
+  "pos": zod.number().describe('Position 0-100')
+}))
+}).nullish(),
   "shareToken": zod.string(),
   "viewCount": zod.number(),
   "expiresAt": zod.string().nullish(),

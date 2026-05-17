@@ -5,6 +5,7 @@
  * FunScript Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { FunscriptFileData } from './funscriptFileData';
 
 export interface FunScriptUpdate {
   /** @minLength 1 */
@@ -13,6 +14,7 @@ export interface FunScriptUpdate {
   description?: string | null;
   /** @nullable */
   contentUrl?: string | null;
+  funscriptData?: FunscriptFileData | null;
   /** @nullable */
   expiresAt?: string | null;
 }

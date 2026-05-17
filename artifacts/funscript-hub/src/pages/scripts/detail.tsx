@@ -7,6 +7,7 @@ import {
   useListScriptAccesses,
   getListScriptAccessesQueryKey,
   useDeleteScript,
+  useUpdateScript,
   getListScriptsQueryKey
 } from "@workspace/api-client-react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -14,6 +15,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useState } from "react";
 import { 
   ArrowLeft, 
   Eye, 
@@ -21,8 +23,11 @@ import {
   Share2,
   Users,
   Activity,
-  Globe
+  Globe,
+  CheckCircle2,
+  Save
 } from "lucide-react";
+import { HandyRecorder, type FunscriptData } from "@/components/handy-recorder";
 import { format } from "date-fns";
 import {
   AlertDialog,
@@ -73,6 +78,22 @@ export default function ScriptDetail() {
   });
 
   const deleteScript = useDeleteScript();
+  const updateScript = useUpdateScript();
+  const [pendingRecording, setPendingRecording] = useState<FunscriptData | null>(null);
+
+  function handleSaveRecording() {
+    if (!pendingRecording) return;
+    updateScript.mutate({ id: scriptId, data: { funscriptData: pendingRecording } }, {
+      onSuccess: () => {
+        toast({ title: "Recording saved", description: "The Handy recording has been saved to this script." });
+        queryClient.invalidateQueries({ queryKey: getGetScriptQueryKey(scriptId) });
+        setPendingRecording(null);
+      },
+      onError: () => {
+        toast({ variant: "destructive", title: "Error", description: "Failed to save recording." });
+      }
+    });
+  }
 
   function handleDelete() {
     deleteScript.mutate({ id: scriptId }, {
@@ -216,6 +237,36 @@ export default function ScriptDetail() {
             )}
           </CardContent>
         </Card>
+      </div>
+
+      {/* Handy Recorder */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold">Handy Recording</h3>
+            <p className="text-sm text-muted-foreground">
+              {script.funscriptData
+                ? `Current recording: ${script.funscriptData.actions.length} points`
+                : "No recording attached — record or import one below"}
+            </p>
+          </div>
+          {pendingRecording && (
+            <Button onClick={handleSaveRecording} disabled={updateScript.isPending} className="gap-2">
+              <Save className="w-4 h-4" />
+              {updateScript.isPending ? "Saving…" : "Save Recording"}
+            </Button>
+          )}
+        </div>
+        <HandyRecorder
+          onScriptReady={(data) => setPendingRecording(data)}
+          initialData={script.funscriptData ?? null}
+        />
+        {pendingRecording && (
+          <p className="text-xs text-green-600 flex items-center gap-1">
+            <CheckCircle2 className="w-3 h-3" />
+            {pendingRecording.actions.length} points ready — click "Save Recording" to attach to this script
+          </p>
+        )}
       </div>
 
       <Card>

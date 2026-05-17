@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import { eq, sql } from "drizzle-orm";
-import { db, funscriptsTable, creatorsTable, accessLogsTable } from "@workspace/db";
+import { db, funscriptsTable, creatorsTable } from "@workspace/db";
 import { serializeDates } from "../lib/serialize";
 import {
   CreateScriptBody,
@@ -32,6 +32,7 @@ async function getScriptWithCreator(id: number) {
       title: funscriptsTable.title,
       description: funscriptsTable.description,
       contentUrl: funscriptsTable.contentUrl,
+      funscriptData: funscriptsTable.funscriptData,
       shareToken: funscriptsTable.shareToken,
       viewCount: funscriptsTable.viewCount,
       expiresAt: funscriptsTable.expiresAt,
@@ -54,6 +55,7 @@ router.get("/scripts", async (req, res): Promise<void> => {
       title: funscriptsTable.title,
       description: funscriptsTable.description,
       contentUrl: funscriptsTable.contentUrl,
+      funscriptData: funscriptsTable.funscriptData,
       shareToken: funscriptsTable.shareToken,
       viewCount: funscriptsTable.viewCount,
       expiresAt: funscriptsTable.expiresAt,
@@ -83,6 +85,7 @@ router.get("/creators/:creatorId/scripts", async (req, res): Promise<void> => {
       title: funscriptsTable.title,
       description: funscriptsTable.description,
       contentUrl: funscriptsTable.contentUrl,
+      funscriptData: funscriptsTable.funscriptData,
       shareToken: funscriptsTable.shareToken,
       viewCount: funscriptsTable.viewCount,
       expiresAt: funscriptsTable.expiresAt,
@@ -112,6 +115,7 @@ router.post("/scripts", async (req, res): Promise<void> => {
     shareToken: string;
     description?: string;
     contentUrl?: string;
+    funscriptData?: unknown;
     expiresAt?: Date;
   } = {
     creatorId: parsed.data.creatorId,
@@ -121,6 +125,7 @@ router.post("/scripts", async (req, res): Promise<void> => {
 
   if (parsed.data.description != null) insertData.description = parsed.data.description;
   if (parsed.data.contentUrl != null) insertData.contentUrl = parsed.data.contentUrl;
+  if (parsed.data.funscriptData != null) insertData.funscriptData = parsed.data.funscriptData;
   if (parsed.data.expiresAt != null) insertData.expiresAt = new Date(parsed.data.expiresAt);
 
   const [script] = await db
@@ -172,12 +177,14 @@ router.patch("/scripts/:id", async (req, res): Promise<void> => {
     title?: string;
     description?: string | null;
     contentUrl?: string | null;
+    funscriptData?: unknown | null;
     expiresAt?: Date | null;
   } = {};
 
   if (parsed.data.title !== undefined) updateData.title = parsed.data.title;
   if (parsed.data.description !== undefined) updateData.description = parsed.data.description;
   if (parsed.data.contentUrl !== undefined) updateData.contentUrl = parsed.data.contentUrl;
+  if (parsed.data.funscriptData !== undefined) updateData.funscriptData = parsed.data.funscriptData;
   if (parsed.data.expiresAt !== undefined) {
     updateData.expiresAt = parsed.data.expiresAt ? new Date(parsed.data.expiresAt) : null;
   }

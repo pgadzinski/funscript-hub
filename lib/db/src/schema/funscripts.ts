@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { creatorsTable } from "./creators";
@@ -9,6 +9,7 @@ export const funscriptsTable = pgTable("funscripts", {
   title: text("title").notNull(),
   description: text("description"),
   contentUrl: text("content_url"),
+  funscriptData: jsonb("funscript_data"),
   shareToken: text("share_token").notNull().unique(),
   viewCount: integer("view_count").notNull().default(0),
   expiresAt: timestamp("expires_at", { withTimezone: true }),

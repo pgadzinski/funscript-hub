@@ -38,6 +38,20 @@ export interface CreatorUpdate {
   bio?: string | null;
 }
 
+export interface FunscriptAction {
+  /** Milliseconds from start */
+  at: number;
+  /** Position 0-100 */
+  pos: number;
+}
+
+export interface FunscriptFileData {
+  version: string;
+  inverted?: boolean;
+  range?: number;
+  actions: FunscriptAction[];
+}
+
 export interface FunScript {
   id: number;
   creatorId: number;
@@ -50,6 +64,7 @@ export interface FunScript {
   description?: string | null;
   /** @nullable */
   contentUrl?: string | null;
+  funscriptData?: FunscriptFileData | null;
   shareToken: string;
   viewCount: number;
   /** @nullable */
@@ -64,6 +79,7 @@ export interface FunScriptInput {
   title: string;
   description?: string;
   contentUrl?: string;
+  funscriptData?: FunscriptFileData;
   expiresAt?: string;
 }
 
@@ -74,6 +90,7 @@ export interface FunScriptUpdate {
   description?: string | null;
   /** @nullable */
   contentUrl?: string | null;
+  funscriptData?: FunscriptFileData | null;
   /** @nullable */
   expiresAt?: string | null;
 }

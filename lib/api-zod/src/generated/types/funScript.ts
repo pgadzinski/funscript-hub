@@ -5,6 +5,7 @@
  * FunScript Hub API
  * OpenAPI spec version: 0.1.0
  */
+import type { FunscriptFileData } from './funscriptFileData';
 
 export interface FunScript {
   id: number;
@@ -18,6 +19,7 @@ export interface FunScript {
   description?: string | null;
   /** @nullable */
   contentUrl?: string | null;
+  funscriptData?: FunscriptFileData | null;
   shareToken: string;
   viewCount: number;
   /** @nullable */
