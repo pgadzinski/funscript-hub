@@ -41,6 +41,17 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
   Table,
   TableBody,
   TableCell,
@@ -80,6 +91,34 @@ export default function ScriptDetail() {
   const deleteScript = useDeleteScript();
   const updateScript = useUpdateScript();
   const [pendingRecording, setPendingRecording] = useState<FunscriptData | null>(null);
+  const [editOpen, setEditOpen] = useState(false);
+  const [editTitle, setEditTitle] = useState("");
+  const [editDescription, setEditDescription] = useState("");
+  const [editContentUrl, setEditContentUrl] = useState("");
+
+  function openEdit() {
+    setEditTitle(script?.title ?? "");
+    setEditDescription(script?.description ?? "");
+    setEditContentUrl(script?.contentUrl ?? "");
+    setEditOpen(true);
+  }
+
+  function handleSaveEdit() {
+    updateScript.mutate(
+      { id: scriptId, data: { title: editTitle, description: editDescription || null, contentUrl: editContentUrl || null } },
+      {
+        onSuccess: () => {
+          toast({ title: "Script updated", description: "Your changes have been saved." });
+          queryClient.invalidateQueries({ queryKey: getGetScriptQueryKey(scriptId) });
+          queryClient.invalidateQueries({ queryKey: getListScriptsQueryKey() });
+          setEditOpen(false);
+        },
+        onError: () => {
+          toast({ variant: "destructive", title: "Error", description: "Failed to save changes." });
+        },
+      }
+    );
+  }
 
   function handleSaveRecording() {
     if (!pendingRecording) return;
@@ -164,6 +203,9 @@ export default function ScriptDetail() {
         <div className="flex gap-2">
           <Button variant="outline" onClick={copyShareUrl} className="gap-2">
             <Share2 className="w-4 h-4" /> Share Link
+          </Button>
+          <Button variant="outline" onClick={openEdit} className="gap-2">
+            <Save className="w-4 h-4" /> Edit
           </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
@@ -370,6 +412,56 @@ export default function ScriptDetail() {
           )}
         </CardContent>
       </Card>
+
+      {/* Edit Dialog */}
+      <Dialog open={editOpen} onOpenChange={setEditOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Edit Script</DialogTitle>
+            <DialogDescription>Update the details for this script.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-title">Title</Label>
+              <Input
+                id="edit-title"
+                value={editTitle}
+                onChange={(e) => setEditTitle(e.target.value)}
+                placeholder="Script title"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-description">Description</Label>
+              <Textarea
+                id="edit-description"
+                value={editDescription}
+                onChange={(e) => setEditDescription(e.target.value)}
+                placeholder="Optional description"
+                rows={3}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="edit-content-url">Content URL</Label>
+              <Input
+                id="edit-content-url"
+                value={editContentUrl}
+                onChange={(e) => setEditContentUrl(e.target.value)}
+                placeholder="https://…"
+                type="url"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditOpen(false)}>Cancel</Button>
+            <Button
+              onClick={handleSaveEdit}
+              disabled={updateScript.isPending || !editTitle.trim()}
+            >
+              {updateScript.isPending ? "Saving…" : "Save Changes"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
