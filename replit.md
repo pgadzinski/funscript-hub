@@ -58,6 +58,11 @@ A web app for Content Creators to manage and share FunScripts with their subscri
 - Date fields from Drizzle come as JS Date objects; wrap in `serializeDates()` before Zod.parse()
 - After each OpenAPI spec change: run codegen, then rebuild libs
 
+## GitHub
+
+- Repository: https://github.com/pgadzinski/funscript-hub
+- Remote: `origin` → `https://github.com/pgadzinski/funscript-hub.git`
+
 ## Pointers
 
 - See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
